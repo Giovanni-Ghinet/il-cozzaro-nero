@@ -6,17 +6,22 @@ import { queryProduct, queryProductCategory, queryProductLimit, queryProductSear
 
 export const index = async (request, response) => {
     const { latest, search } = request.query || {};
+    console.log(latest);
+    
     const slug = request.categorySlug;
-    const latestNumber = stringCheck(latest) ? Number(latest) : null;
+    const latestNumber = latest ? parseInt(latest, 10) : null;
+    console.log(latestNumber);
+    
     const searchedString = stringCheck(search) ? search : null;
 
     let productsList = null;
     try {
         if (slug){
             const [rows] = await connection.execute(queryProductCategory,[slug]);
+            console.log(rows);
+            
             if (rows.length === 0){
                 return response
-                        .status(404)
                         .json({
                             error: 'La ricerca per categoria non ha prodotto risultati',
                             result: null
@@ -32,17 +37,16 @@ export const index = async (request, response) => {
         }
 
 
-
-
-        if (!Number.isNaN(latestNumber) && latestNumber !== null) {
-            const [rows] = await connection.execute(queryProductLimit, [latestNumber]);
+        if (latestNumber && !isNaN(latestNumber) && latestNumber > 0) {
+            
+            const [rows] = await connection.query(queryProductLimit, [latestNumber]);
             productsList = normalizingProducts(rows);
         } else if (searchedString !== null) {
+            
             const searchParam = `%${searchedString}%`;
             const [rows] = await connection.execute(queryProductSearch, [searchParam, searchParam]);
             if (rows.length === 0) {
                 return response
-                    .status(404)
                     .json({
                         error: 'La ricerca non ha prodotto risultati',
                         result: null
@@ -59,6 +63,7 @@ export const index = async (request, response) => {
                 result: productsList
             });
     } catch (error) {
+        console.log(error)
         response
             .status(500)
             .json({
@@ -74,7 +79,6 @@ export const show = async (request, response) => {
         const [rows] = await connection.execute(queryProductShow, [id]);
         if (rows.length === 0) {
             return response
-                .status(404)
                 .json({
                     error: 'Prodotto non trovato',
                     result: null
@@ -88,6 +92,7 @@ export const show = async (request, response) => {
                 result: searchedProduct
             });
     } catch (error) {
+        
         response
             .status(500)
             .json({
