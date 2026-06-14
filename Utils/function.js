@@ -8,6 +8,13 @@ const defaultOBJReceived = {
     product: ""
 };
 
+const categpry = [
+    'Infuocato del Mare dei Ladri',
+    'Affumicato dei Relitti',
+    'Abisso del Kraken',
+    "Taverna dell'Ancora Spezzata",
+    "Maledizione dell'Ordine delle Anime"
+];
 
 
 export const idCheck = (id) => {
@@ -82,13 +89,33 @@ export function stringCheck(string) {
 
 
 
+export async function generateUniqueCategorySlug(name, dbConnection) {
+    let baseSlug = name
+        .toLowerCase()
+        .normalize("NFD") //normalizza le lettere con accento
+        .replace(/[\u0300-\u036f]/g, "") // rimuove il carattere degli accenti isolati
+        .replace(/['\s]+/g, "-") //sostituisce gli spazi con un trattino
+        .replace(/[^a-z0-9-]+/g, "") //rimuove tutto ció che non é lettera numero o trattino
+        .replace(/-+/g, "-") // sostituisce i trattini multipli con uno solo
+        .replace(/^-+|-+$/g, ""); //rimuove i trattini ad inizio e fine stringa
 
+    let currentSlug = baseSlug;
+    let counter = 1;
+    let isUnique = false;
 
-// if (!obj || typeof obj !== 'object') return false;
-//     const chiavi = Object.keys(obj);
-//     if (chiavi.length !== 1 || chiavi[0] !== 'latest') return false;
-//     const { latest } = obj;
-//     if (typeof latest !== 'string' && typeof latest !== 'number') return false;
-//     if (typeof latest === 'string' && latest.trim() === '') return false;
-//     const numero = Number(latest);
-//     if (Number.isNaN(numero)) return false;
+    while (!isUnique) {
+        const [rows] = await dbConnection.excute(
+            'SELECT id FROM categories WHERE slug = ? LIMIT 1', 
+            [currentSlug]
+        );
+
+        if (rows.length === 0) {
+            isUnique = true;
+        } else {
+            currentSlug = `${baseSlug}-${counter}`;
+            counter++;
+        }
+    }
+
+    return currentSlug;
+}

@@ -4,7 +4,6 @@ DROP TABLE IF EXISTS `products`;
 DROP TABLE IF EXISTS `categories`;
 
 
-
 CREATE TABLE `products`(
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(255) NOT NULL UNIQUE,
@@ -19,7 +18,8 @@ CREATE TABLE `products`(
 );
 CREATE TABLE `categories`(
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `name` VARCHAR(100) NOT NULL
+    `name` VARCHAR(100) NOT NULL,
+    `slug` VARCHAR(150) NOT NULl UNIQUE
 );
 CREATE TABLE `reviews`(
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -43,3 +43,5 @@ ALTER TABLE
 ALTER TABLE
     `product_category` ADD CONSTRAINT `product_category_id_category_foreign` FOREIGN KEY(`id_category`) REFERENCES `categories`(`id`)
     ON DELETE CASCADE;
+    
+    

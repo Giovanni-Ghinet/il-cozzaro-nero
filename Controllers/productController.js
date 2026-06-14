@@ -1,16 +1,39 @@
 import { connection } from '../Utils/connection.js';
 import { normalizingProducts } from '../Utils/function.js';
 import { stringCheck } from '../Utils/function.js';
-import { queryProduct, queryProductLimit, queryProductSearch, queryProductShow } from '../Utils/query.js';
+import { queryProduct, queryProductCategory, queryProductLimit, queryProductSearch, queryProductShow } from '../Utils/query.js';
 
 
 export const index = async (request, response) => {
     const { latest, search } = request.query || {};
+    const slug = request.categorySlug;
     const latestNumber = stringCheck(latest) ? Number(latest) : null;
     const searchedString = stringCheck(search) ? search : null;
 
     let productsList = null;
     try {
+        if (slug){
+            const [rows] = await connection.execute(queryProductCategory,[slug]);
+            if (rows.length === 0){
+                return response
+                        .status(404)
+                        .json({
+                            error: 'La ricerca per categoria non ha prodotto risultati',
+                            result: null
+                        });
+            }
+            productsList = normalizingProducts(rows);
+            return response
+                .json({
+                    error: null,
+                    result: productsList
+                });
+            
+        }
+
+
+
+
         if (!Number.isNaN(latestNumber) && latestNumber !== null) {
             const [rows] = await connection.execute(queryProductLimit, [latestNumber]);
             productsList = normalizingProducts(rows);
@@ -18,10 +41,10 @@ export const index = async (request, response) => {
             const searchParam = `%${searchedString}%`;
             const [rows] = await connection.execute(queryProductSearch, [searchParam, searchParam]);
             if (rows.length === 0) {
-                response
+                return response
                     .status(404)
                     .json({
-                        error: 'La ricerca non ha trovato prodotti',
+                        error: 'La ricerca non ha prodotto risultati',
                         result: null
                     });
             }
