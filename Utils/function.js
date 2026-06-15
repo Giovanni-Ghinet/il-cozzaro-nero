@@ -4,7 +4,7 @@ const defaultOBJReceived = {
     title: "",
     text: "",
     author: "",
-    latest: null,
+    valutation: null,
     product: ""
 };
 
@@ -27,13 +27,13 @@ const keyValidator = (obj) => {
 }
 
 const valueValidator = (obj) => {
-    const { title, text, author, latest, product } = obj;
+    const { title, text, author, valutation, product } = obj;
 
     if (typeof title !== 'string' || title.trim() === '' || title.length > 200) return false;
     if (typeof text !== 'string' || text.trim() === '') return false;
     if (typeof author !== 'string' || author.trim() === '' || author.length > 200) return false;
     if (typeof product !== 'string' || product.trim() === '' || product.length > 200) return false;
-    if (typeof latest !== 'number' || latest < 0 || latest > 5 || Number.isNaN(latest)) return false;
+    if (typeof valutation !== 'number' || valutation < 0 || valutation > 5 || Number.isNaN(latest)) return false;
 
     return true;
 }
