@@ -15,7 +15,7 @@ async function index(request, response) {
             FROM reviews r
             JOIN products p 
                 ON r.id_product = p.id
-            order by date`;
+            order by date desc;`;
 
         const [results] = await connection.query(sql);
 

@@ -4,10 +4,9 @@ import {index} from '../Controllers/productController.js';
 import {show} from '../Controllers/productController.js'; 
 import categoryCheck from '../Middlewears/categoryCheck.js';
 
-const app = express();
+const router = express.Router();
 
-app.get('/', categoryCheck,index);
-app.get('/:id', idValidator, show);
+router.get('/', categoryCheck, index);
+router.get('/:id', idValidator, show);
 
-export default app;
-
+export default router;
