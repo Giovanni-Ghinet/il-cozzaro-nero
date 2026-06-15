@@ -1,75 +1,84 @@
 import { connection } from '../Utils/connection.js';
 import { normalizingProducts } from '../Utils/function.js';
 import { stringCheck } from '../Utils/function.js';
-import { queryProduct, queryProductCategory, queryProductLimit, queryProductSearch, queryProductShow } from '../Utils/query.js';
+import { queryProduct, queryProductCategory, queryProductLimit, queryProductSearch, queryProductShow, queryProductCategoryAndSearch } from '../Utils/query.js';
 
 
 export const index = async (request, response) => {
     const { latest, search } = request.query || {};
-    console.log(latest);
     
-    const slug = request.categorySlug;
+    const slug = request.categorySlug; // Validato dal middleware
     const latestNumber = latest ? parseInt(latest, 10) : null;
-    console.log(latestNumber);
-    
-    const searchedString = stringCheck(search) ? search : null;
+    const searchedString = stringCheck(search) ? search : null; // Funzione di controllo stringa
 
     let productsList = null;
+
     try {
-        if (slug){
-            const [rows] = await connection.execute(queryProductCategory,[slug]);
-            console.log(rows);
+        // CASO 1: Presenti SIA Categoria (valida) SIA Ricerca Testuale
+        if (slug && searchedString) {
+            const searchParam = `%${searchedString}%`;
+            const [rows] = await connection.execute(queryProductCategoryAndSearch, [slug, searchParam, searchParam]);
             
-            if (rows.length === 0){
-                return response
-                        .json({
-                            error: 'La ricerca per categoria non ha prodotto risultati',
-                            result: null
-                        });
+            if (rows.length === 0) {
+                return response.json({
+                    error: 'La ricerca all\'interno di questa categoria non ha prodotto risultati',
+                    result: null
+                });
             }
             productsList = normalizingProducts(rows);
-            return response
-                .json({
-                    error: null,
-                    result: productsList
-                });
-            
         }
-
-
-        if (latestNumber && !isNaN(latestNumber) && latestNumber > 0) {
+        
+        // CASO 2: Presente SOLO la Categoria (valida)
+        else if (slug) {
+            const [rows] = await connection.execute(queryProductCategory, [slug]);
             
-            const [rows] = await connection.query(queryProductLimit, [latestNumber]);
+            if (rows.length === 0) {
+                return response.json({
+                    error: 'La ricerca per categoria non ha prodotto risultati',
+                    result: null
+                });
+            }
             productsList = normalizingProducts(rows);
-        } else if (searchedString !== null) {
-            
+        }
+        
+        // CASO 3: Presente SOLO la Ricerca Testuale
+        else if (searchedString) {
             const searchParam = `%${searchedString}%`;
             const [rows] = await connection.execute(queryProductSearch, [searchParam, searchParam]);
+            
             if (rows.length === 0) {
-                return response
-                    .json({
-                        error: 'La ricerca non ha prodotto risultati',
-                        result: null
-                    });
+                return response.json({
+                    error: 'La ricerca testuale non ha prodotto risultati',
+                    result: null
+                });
             }
             productsList = normalizingProducts(rows);
-        } else {
+        }
+        
+        // CASO 4: Richiesta degli ultimi "N" prodotti (senza filtri di ricerca)
+        else if (latestNumber && !isNaN(latestNumber) && latestNumber > 0) {
+            const [rows] = await connection.query(queryProductLimit, [latestNumber]);
+            productsList = normalizingProducts(rows);
+        }
+        
+        // CASO 5: Nessun parametro fornito (Ritorna tutti i prodotti)
+        else {
             const [rows] = await connection.execute(queryProduct);
             productsList = normalizingProducts(rows);
         }
-        response
-            .json({
-                error: null,
-                result: productsList
-            });
+
+        // Risposta unica di successo per tutti i casi che hanno trovato prodotti
+        return response.json({
+            error: null,
+            result: productsList
+        });
+
     } catch (error) {
-        console.log(error)
-        response
-            .status(500)
-            .json({
-                error: "errore nella connessione",
-                result: null
-            });
+        console.error(error);
+        return response.status(500).json({
+            error: "Errore nella connessione al database",
+            result: null
+        });
     }
 };
 

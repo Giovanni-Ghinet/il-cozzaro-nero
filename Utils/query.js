@@ -81,3 +81,15 @@ export const queryProductSearch = `
                 order by created_at;
             `;
 
+export const queryProductCategoryAndSearch = `
+    SELECT
+        p.id, p.name, p.description, p.price, p.country, p.image, 
+        p.availability, p.created_at, r.id AS id_review, r.author, r.title, 
+        r.text, r.valutation, c.name AS category, c.slug
+    FROM products p
+        JOIN reviews r ON r.id_product = p.id
+        JOIN product_category pt ON pt.id_product = p.id
+        JOIN categories c ON c.id = pt.id_category
+    WHERE c.slug = ? AND (p.name LIKE ? OR p.description LIKE ?)
+    ORDER BY p.created_at;
+`;

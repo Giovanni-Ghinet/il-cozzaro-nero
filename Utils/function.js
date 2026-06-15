@@ -8,13 +8,7 @@ const defaultOBJReceived = {
     product: ""
 };
 
-const categpry = [
-    'Infuocato del Mare dei Ladri',
-    'Affumicato dei Relitti',
-    'Abisso del Kraken',
-    "Taverna dell'Ancora Spezzata",
-    "Maledizione dell'Ordine delle Anime"
-];
+
 
 
 export const idCheck = (id) => {
@@ -104,7 +98,7 @@ export async function generateUniqueCategorySlug(name, dbConnection) {
     let isUnique = false;
 
     while (!isUnique) {
-        const [rows] = await dbConnection.excute(
+        const [rows] = await dbConnection.execute(
             'SELECT id FROM categories WHERE slug = ? LIMIT 1', 
             [currentSlug]
         );

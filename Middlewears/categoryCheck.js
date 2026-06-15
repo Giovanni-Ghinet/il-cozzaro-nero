@@ -8,8 +8,7 @@ async function categoryCheck(request, response, next) {
 
         if (!slug) {
             request.categorySlug = null;
-            next();
-            return;
+            return next();
         }
 
 
@@ -26,22 +25,22 @@ async function categoryCheck(request, response, next) {
 
         if (rows.length === 0) {
             request.categorySlug = null;
-            next();
             return;
-            };
-
+        } else {
             request.categorySlug = rows[0].slug;
-
-            next();
-
-        } catch (error) {
-            response
-                .status(500)
-                .json({
-                    error: "Errore interno del server",
-                    result: null
-                });
         }
-    };
 
-    export default categoryCheck
+
+        next();
+
+    } catch (error) {
+        response
+            .status(500)
+            .json({
+                error: "Errore interno del server durante il controllo categoria",
+                result: null
+            });
+    }
+};
+
+export default categoryCheck
