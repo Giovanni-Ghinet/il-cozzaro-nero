@@ -33,7 +33,7 @@ const valueValidator = (obj) => {
     if (typeof text !== 'string' || text.trim() === '') return false;
     if (typeof author !== 'string' || author.trim() === '' || author.length > 200) return false;
     if (typeof product !== 'string' || product.trim() === '' || product.length > 200) return false;
-    if (typeof valutation !== 'number' || valutation < 0 || valutation > 5 || Number.isNaN(latest)) return false;
+    if (typeof valutation !== 'number' || valutation < 0 || valutation > 5 || Number.isNaN(valutation)) return false;
 
     return true;
 }
