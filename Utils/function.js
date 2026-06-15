@@ -113,3 +113,16 @@ export async function generateUniqueCategorySlug(name, dbConnection) {
 
     return currentSlug;
 }
+
+
+export function reviewsNormalizer(recensione) {
+
+    const votoNumero = parseFloat(recensione.valutation);
+    const formattedDate = recensione.date ? new Date(recensione.date).toLocaleDateString('it-IT') : null;
+
+    return {
+        ...recensione,
+        valutation: votoNumero,
+        date: formattedDate
+    };
+}

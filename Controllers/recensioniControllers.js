@@ -1,4 +1,5 @@
 import { connection } from "../Utils/connection.js";
+import { reviewsNormalizer } from "../Utils/function.js";
 
 
 
@@ -10,17 +11,19 @@ INDEX
 async function index(request, response) {
     try {
         const sql = `
-            SELECT r.id, r.title, r.valutation, r.text, r.author, p.name AS product_name
+            SELECT r.id, r.title, r.valutation, r.text, r.author, p.name AS product_name, r.created_at as date
             FROM reviews r
             JOIN products p 
-                ON r.id_product = p.id`;
+                ON r.id_product = p.id
+            order by date`;
 
         const [results] = await connection.query(sql);
-        
+
+        const resultsNormalized = results.map(review => (reviewsNormalizer(review)));
 
         response.status(200).json({
             error: null,
-            result: results
+            result: resultsNormalized
         });
     } catch (error) {
         console.error(error);
@@ -138,14 +141,14 @@ async function destroy(request, response) {
         const sql = "DELETE FROM reviews WHERE id = ?";
 
         const [result] = await connection.execute(sql, [id]);
-        if (result.affectedRows > 0){   
+        if (result.affectedRows > 0) {
             response
-            .status(204)
-            .json({
-                error: null,
-                message: "Recensione eliminata"
-            });
-        }else{
+                .status(204)
+                .json({
+                    error: null,
+                    message: "Recensione eliminata"
+                });
+        } else {
             response
                 .status(400)
                 .json({
@@ -164,4 +167,4 @@ async function destroy(request, response) {
 }
 
 
-    export { destroy, index, show, store };
+export { destroy, index, show, store };

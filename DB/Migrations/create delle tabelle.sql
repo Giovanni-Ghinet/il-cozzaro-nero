@@ -27,7 +27,8 @@ CREATE TABLE `reviews`(
     `text` TEXT NOT NULL,
     `id_product` BIGINT UNSIGNED,
     `author` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL
+    `title` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE `product_category`(
     `id_product` BIGINT UNSIGNED NOT NULL,
