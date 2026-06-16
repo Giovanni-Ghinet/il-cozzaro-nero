@@ -4,13 +4,13 @@ export const queryProduct = `
                 p.availability, p.created_at,r.id as id_review, r.author, r.title, 
                 r.text, r.valutation, c.name as category
             from products p
-                join reviews r
+                left join reviews r
                     on r.id_product = p.id
                 join product_category pt
                     on pt.id_product = p.id
                 join categories c
                     on c.id = pt.id_category
-            order by created_at;
+            order by p.created_at;
 `
 
 export const queryProductCategory = `
@@ -19,14 +19,14 @@ export const queryProductCategory = `
                 p.availability, p.created_at,r.id as id_review, r.author, r.title, 
                 r.text, r.valutation, c.name as category, c.slug
             from products p
-                join reviews r
+                left join reviews r
                     on r.id_product = p.id
                 join product_category pt
                     on pt.id_product = p.id
                 join categories c
                     on c.id = pt.id_category
             where c.slug = ?
-            order by created_at;
+            order by p.created_at;
 `
 
 
@@ -42,7 +42,7 @@ export const queryProductLimit = `
     order by created_at desc 
     limit ?
     ) p
-    join reviews r 
+    left join reviews r 
         on r.id_product = p.id
     join product_category pt 
         on pt.id_product = p.id
@@ -54,7 +54,7 @@ export const queryProductLimit = `
 export const queryProductShow = `
                 select p.id, p.name, p.description, p.price, p.country, p.image, p.availability, p.created_at,r.id as id_review, r.author, r.title, r.text, r.valutation, c.name as category
                 from products p
-                    join reviews r
+                    left join reviews r
                         on r.id_product = p.id
                     join product_category pt
                         on pt.id_product = p.id
@@ -71,14 +71,14 @@ export const queryProductSearch = `
                 p.availability, p.created_at,r.id as id_review, r.author, r.title, 
                 r.text, r.valutation, c.name as category
                 from products p
-                    join reviews r
+                    left join reviews r
                         on r.id_product = p.id
                     join product_category pt
                         on pt.id_product = p.id
                     join categories c
                         on c.id = pt.id_category
                 where p.name like ? or p.description like ?
-                order by created_at;
+                order by p.created_at;
             `;
 
 export const queryProductCategoryAndSearch = `
@@ -87,7 +87,7 @@ export const queryProductCategoryAndSearch = `
         p.availability, p.created_at, r.id AS id_review, r.author, r.title, 
         r.text, r.valutation, c.name AS category, c.slug
     FROM products p
-        JOIN reviews r ON r.id_product = p.id
+        LEFT JOIN reviews r ON r.id_product = p.id
         JOIN product_category pt ON pt.id_product = p.id
         JOIN categories c ON c.id = pt.id_category
     WHERE c.slug = ? AND (p.name LIKE ? OR p.description LIKE ?)

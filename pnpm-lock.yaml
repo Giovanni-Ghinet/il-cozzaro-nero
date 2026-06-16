@@ -11,6 +11,9 @@ importers:
       '@langchain/anthropic':
         specifier: ^1.4.1
         version: 1.4.1(@langchain/core@1.1.49)
+      '@langchain/core':
+        specifier: ^1.1.49
+        version: 1.1.49
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -26,6 +29,9 @@ importers:
       mysql2:
         specifier: ^3.22.5
         version: 3.22.5(@types/node@25.9.2)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
 
 packages:
 

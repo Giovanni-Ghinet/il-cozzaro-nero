@@ -24,8 +24,10 @@ async function categoryCheck(request, response, next) {
 
 
         if (rows.length === 0) {
-            request.categorySlug = null;
-            return;
+            return response.status(404).json({
+                error: "La categoria specificata non esiste",
+                result: null
+            });
         } else {
             request.categorySlug = rows[0].slug;
         }
